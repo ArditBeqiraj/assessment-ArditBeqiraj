@@ -1,0 +1,8 @@
+# Editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+Thumbs.db
+
+# Local backups
+/backups/*.sql

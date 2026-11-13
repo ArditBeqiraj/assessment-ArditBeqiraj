@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="vmGrad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#FF9D63"/>
+      <stop offset="100%" stop-color="#F26835"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="url(#vmGrad)"/>
+  <path d="M18 22L38 12V42L18 32V22Z" fill="white"/>
+  <rect x="18" y="44" width="28" height="5" rx="2.5" fill="rgba(255,255,255,0.85)"/>
+  <rect x="18" y="35" width="20" height="4" rx="2" fill="rgba(255,255,255,0.75)"/>
+</svg>

@@ -1,0 +1,13 @@
+# Dependencies and generated builds
+/node_modules/
+/dist/
+
+# Local frontend environment
+.env
+.env.local
+.env.*.local
+
+# Frontend runtime files
+*.log
+*.tmp
+*.cache

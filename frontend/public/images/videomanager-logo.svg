@@ -1,0 +1,17 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">VideoLab logo</title>
+  <desc id="desc">A warm orange rounded square with a play button and stacked video bar elements.</desc>
+  <defs>
+    <linearGradient id="vmGradient" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#FF9D63"/>
+      <stop offset="100%" stop-color="#F26835"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#vmGradient)"/>
+  <rect x="28" y="30" width="66" height="50" rx="12" fill="rgba(255,255,255,0.14)"/>
+  <path d="M38 44L74 28V76L38 60V44Z" fill="white"/>
+  <rect x="32" y="88" width="62" height="10" rx="5" fill="rgba(255,255,255,0.82)"/>
+  <rect x="32" y="76" width="46" height="8" rx="4" fill="rgba(255,255,255,0.72)"/>
+  <rect x="86" y="36" width="8" height="54" rx="4" fill="rgba(255,255,255,0.82)"/>
+  <rect x="96" y="42" width="8" height="42" rx="4" fill="rgba(255,255,255,0.7)"/>
+</svg>

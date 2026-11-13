@@ -1,0 +1,13 @@
+# Runtime uploads
+/uploads/*
+!/uploads/.gitignore
+
+# Private backend environment
+.env
+.env.local
+.env.*.local
+
+# Backend runtime files
+*.log
+*.tmp
+*.cache
