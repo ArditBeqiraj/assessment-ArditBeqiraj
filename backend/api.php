@@ -24,7 +24,7 @@ $bookmarkController = new BookmarkController($pdo);
 $adminController = new AdminController($pdo);
 
 if ($method === 'GET' && $resource === 'session') {
-    jsonSuccess('Session loaded.', ['user' => $user]);
+    jsonSuccess('Session loaded.', ['user' => $user, 'csrfToken' => csrfToken()]);
 }
 
 if ($method === 'POST' && $resource === 'login') {
@@ -33,6 +33,10 @@ if ($method === 'POST' && $resource === 'login') {
 
 if ($method === 'POST' && $resource === 'register') {
     $authController->registerUser($_POST);
+}
+
+if (in_array($method, ['POST', 'DELETE'], true)) {
+    verifyCsrfToken();
 }
 
 if (!$user) {
@@ -51,6 +55,8 @@ switch ($method.':'.$resource) {
         $videoController->streamVideo((int) ($_GET['id'] ?? 0), $user);
     case 'POST:videos':
         $videoController->uploadVideo($_POST, $_FILES, $user);
+    case 'DELETE:video':
+        $videoController->deleteVideo((int) ($_GET['id'] ?? 0), $user);
     case 'POST:annotations':
         $annotationController->create($_POST, $user);
     case 'POST:bookmarks':

@@ -132,4 +132,14 @@ class VideoController
 
         jsonSuccess('Video uploaded successfully.', ['id' => $result['id']], null, 201);
     }
+
+    public function deleteVideo(int $id, array $user): never
+    {
+        $result = $this->videoService->delete($id, $user);
+        if (!$result['ok']) {
+            jsonError($result['message'], [], $result['status']);
+        }
+
+        jsonSuccess($result['message']);
+    }
 }

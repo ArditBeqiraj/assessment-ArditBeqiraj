@@ -21,8 +21,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
         exit;
     }
 
-    header('Access-Control-Allow-Methods: GET, HEAD, POST, OPTIONS');
-    header('Access-Control-Allow-Headers: Accept, Content-Type');
+    header('Access-Control-Allow-Methods: GET, HEAD, POST, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Accept, Content-Type, X-CSRF-Token');
     header('Access-Control-Max-Age: 600');
     http_response_code(204);
     exit;
@@ -41,6 +41,25 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 function currentUser(): ?array
 {
     return $_SESSION['user'] ?? null;
+}
+
+function csrfToken(): string
+{
+    if (!isset($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token']) || $_SESSION['csrf_token'] === '') {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['csrf_token'];
+}
+
+function verifyCsrfToken(): void
+{
+    $provided = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    $expected = csrfToken();
+
+    if (!is_string($provided) || $provided === '' || !hash_equals($expected, $provided)) {
+        jsonError('Your security token is invalid. Please try again.', [], 403);
+    }
 }
 
 function isAdmin(): bool

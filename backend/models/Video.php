@@ -65,6 +65,14 @@ class Video
         return (int) $this->pdo->lastInsertId();
     }
 
+    public function deleteById(int $id): bool
+    {
+        $statement = $this->pdo->prepare('DELETE FROM videos WHERE id = ?');
+        $statement->execute([$id]);
+
+        return $statement->rowCount() === 1;
+    }
+
     public function recent(int $limit = 5): array
     {
         $limit = max(1, $limit);

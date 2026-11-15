@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api.js';
 import Layout from '../components/Layout.jsx';
-import { AppLink, EmptyState, Icon } from '../components/ui.jsx';
+import { AppLink, ConfirmDialog, EmptyState, Icon } from '../components/ui.jsx';
 import { VideoCard } from '../components/VideoCard.jsx';
 
 export default function VideosPage({ user, params, navigate, notification, dismissNotification, onLogout, notify, onUnauthorized }) {
@@ -11,6 +11,8 @@ export default function VideosPage({ user, params, navigate, notification, dismi
     const [query, setQuery] = useState(search);
     const [data, setData] = useState(null);
     const [error, setError] = useState('');
+    const [confirmVideo, setConfirmVideo] = useState(null);
+    const [deletingId, setDeletingId] = useState(0);
 
     useEffect(() => setQuery(search), [search]);
 
@@ -30,6 +32,30 @@ export default function VideosPage({ user, params, navigate, notification, dismi
     function searchVideos(event) {
         event.preventDefault();
         navigate('videos', { ...(mine ? { mine: '1' } : {}), ...(query.trim() ? { search: query.trim() } : {}) });
+    }
+
+    function deleteVideo() {
+        if (!confirmVideo) return;
+        const video = confirmVideo;
+        setDeletingId(video.id);
+        apiRequest('video', { method: 'DELETE', params: { id: video.id } })
+            .then(response => {
+                setData(current => current ? {
+                    ...current,
+                    pagination: {
+                        ...current.pagination,
+                        items: current.pagination.items.filter(item => item.id !== video.id),
+                        total: Math.max(0, current.pagination.total - 1),
+                    },
+                } : current);
+                setConfirmVideo(null);
+                notify('success', response.message);
+            })
+            .catch(requestError => {
+                if (requestError.status === 401) return onUnauthorized();
+                notify('error', requestError.message);
+            })
+            .finally(() => setDeletingId(0));
     }
 
     const pagination = data?.pagination || { items: [], total: 0, page: 1, pages: 1, per_page: 8 };
@@ -69,7 +95,14 @@ export default function VideosPage({ user, params, navigate, notification, dismi
                 )}
                 {Boolean(pagination.items.length) && (
                     <div className="video-grid">
-                        {pagination.items.map(video => <VideoCard key={video.id} video={video} navigate={navigate} />)}
+                        {pagination.items.map(video => <VideoCard
+                            key={video.id}
+                            video={video}
+                            navigate={navigate}
+                            canDelete={user.role === 'ADMIN' || Number(video.owner_id) === Number(user.id)}
+                            deleting={deletingId === video.id}
+                            onDelete={setConfirmVideo}
+                        />)}
                     </div>
                 )}
                 <div className="pagination-row">
@@ -81,6 +114,13 @@ export default function VideosPage({ user, params, navigate, notification, dismi
                     </nav>
                 </div>
             </div>
+            {confirmVideo && <ConfirmDialog
+                title="Delete video"
+                message={`Are you sure you want to delete “${confirmVideo.title}”? This action cannot be undone.`}
+                loading={deletingId === confirmVideo.id}
+                onCancel={() => setConfirmVideo(null)}
+                onConfirm={deleteVideo}
+            />}
         </Layout>
     );
 }

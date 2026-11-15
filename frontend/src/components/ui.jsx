@@ -4,7 +4,7 @@ import {
     ArrowLeft, ArrowRight, Bookmark, BookmarkPlus, Check, ChevronRight,
     Circle, CircleAlert, CircleCheck, Clapperboard, LayoutDashboard, Library,
     LogOut, Maximize, MessageSquare, MessageSquarePlus, Minimize, Pause, Pen,
-    Play, Search, Square, TriangleAlert, Upload, X,
+    Play, Search, Square, Trash2, TriangleAlert, Upload, X,
 } from 'lucide-react';
 
 const icons = {
@@ -30,6 +30,7 @@ const icons = {
     play: Play,
     search: Search,
     square: Square,
+    trash: Trash2,
     'triangle-alert': TriangleAlert,
     upload: Upload,
     x: X,
@@ -134,6 +135,21 @@ export function EmptyState({ icon = 'clapperboard', title, message, action }) {
             <h2>{title}</h2>
             <p>{message}</p>
             {action}
+        </div>
+    );
+}
+
+export function ConfirmDialog({ title, message, confirmLabel = 'Delete', loading = false, onCancel, onConfirm }) {
+    return (
+        <div className="confirm-modal" role="presentation" onMouseDown={event => event.target === event.currentTarget && !loading && onCancel()}>
+            <div className="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirm_title">
+                <h3 id="confirm_title">{title}</h3>
+                <p>{message}</p>
+                <div className="confirm-actions">
+                    <Button type="button" variant="secondary" disabled={loading} onClick={onCancel}>Cancel</Button>
+                    <Button type="button" variant="danger" loading={loading} onClick={onConfirm}>{confirmLabel}</Button>
+                </div>
+            </div>
         </div>
     );
 }

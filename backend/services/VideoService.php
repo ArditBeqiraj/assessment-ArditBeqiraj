@@ -6,12 +6,14 @@ require_once dirname(__DIR__).'/models/Bookmark.php';
 
 class VideoService
 {
+    private PDO $pdo;
     private Video $videoModel;
     private Annotation $annotationModel;
     private Bookmark $bookmarkModel;
 
     public function __construct(PDO $pdo)
     {
+        $this->pdo = $pdo;
         $this->videoModel = new Video($pdo);
         $this->annotationModel = new Annotation($pdo);
         $this->bookmarkModel = new Bookmark($pdo);
@@ -43,6 +45,62 @@ class VideoService
     public function playback(int $id): ?array
     {
         return $this->videoModel->find($id);
+    }
+
+    public function delete(int $id, array $user): array
+    {
+        $video = $this->videoModel->find($id);
+        if (!$video) {
+            return ['ok' => false, 'status' => 404, 'message' => 'Video not found.'];
+        }
+
+        $isOwner = (int) ($video['owner_id'] ?? 0) === (int) ($user['id'] ?? 0);
+        $isAdministrator = ($user['role'] ?? '') === 'ADMIN';
+        if (!$isOwner && !$isAdministrator) {
+            return ['ok' => false, 'status' => 403, 'message' => 'You are not allowed to delete this video.'];
+        }
+
+        $files = array_values(array_filter([
+            $this->uploadPath($video['file_name'] ?? ''),
+            $this->uploadPath($video['thumbnail'] ?? ''),
+        ]));
+
+        $this->pdo->beginTransaction();
+        try {
+            if (!$this->videoModel->deleteById($id)) {
+                $this->pdo->rollBack();
+                return ['ok' => false, 'status' => 404, 'message' => 'Video not found.'];
+            }
+            $this->pdo->commit();
+        } catch (Throwable $exception) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $exception;
+        }
+
+        foreach ($files as $file) {
+            if (is_file($file) && !@unlink($file)) {
+                error_log('Video file cleanup failed for '.$file);
+            }
+        }
+
+        return ['ok' => true, 'status' => 200, 'message' => 'Video deleted successfully.'];
+    }
+
+    private function uploadPath(string $filename): ?string
+    {
+        if ($filename === '' || basename($filename) !== $filename) {
+            return null;
+        }
+
+        $directory = realpath(dirname(__DIR__).'/uploads');
+        $path = $directory ? realpath($directory.DIRECTORY_SEPARATOR.$filename) : false;
+        if (!$directory || $path === false || !str_starts_with($path, $directory.DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        return $path;
     }
 
     public function upload(array $input, array $files, int $userId): array

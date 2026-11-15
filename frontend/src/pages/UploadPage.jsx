@@ -3,7 +3,7 @@ import { apiRequest } from '../api.js';
 import Layout from '../components/Layout.jsx';
 import { AppLink, Button, Field, FormError, Icon, IconButton } from '../components/ui.jsx';
 
-const MAX_VIDEO_UPLOAD_BYTES = 40 * 1024 * 1024;
+const MAX_VIDEO_UPLOAD_BYTES = 100 * 1024 * 1024;
 
 function validate(values, videoFile, thumbnail) {
     const errors = {};
@@ -12,7 +12,7 @@ function validate(values, videoFile, thumbnail) {
 
     if (videoFile) {
         if (videoFile.size > MAX_VIDEO_UPLOAD_BYTES || !/\.mp4$/i.test(videoFile.name)) {
-            errors.video_file = 'The video must be an MP4 file under 40MB.';
+            errors.video_file = 'The video must be an MP4 file under 100MB.';
         }
     } else {
         errors.video_file = 'Choose an MP4 video.';
@@ -129,7 +129,7 @@ export default function UploadPage({ user, navigate, notification, dismissNotifi
                     >
                         <span className="file-icon" aria-hidden="true"><Icon name="upload" /></span>
                         <strong>{videoFile?.name || 'Choose an MP4 video'}</strong>
-                        <span>Maximum file size: 40MB</span>
+                        <span>Maximum file size: 100MB</span>
                         <input id="video_file" type="file" accept="video/mp4" onChange={event => setVideoFile(event.target.files?.[0] || null)} />
                     </label>
                     <div className={`validation-slot ${errors.video_file ? 'is-visible' : ''}`}>

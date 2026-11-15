@@ -62,7 +62,7 @@ Build and deploy `frontend/` as a static React application. Set `VITE_API_URL` t
 - PHP JSON API using controllers, services, and models
 - Session authentication across credentialed API requests
 - Asynchronous login and registration with inline validation
-- MP4 uploads up to 40MB in the frontend and 100MB at the API boundary, with optional JPG, PNG, or WebP thumbnails up to 5MB
+- MP4 uploads up to 100MB with optional JPG, PNG, or WebP thumbnails up to 5MB
 - All Videos and My Videos filters, search, and eight-video pagination
 - Clean frontend routes such as `/videos`, `/videos/:id`, `/upload`, and `/admin`
 - Custom play, pause, pointer, touch, and keyboard seeking

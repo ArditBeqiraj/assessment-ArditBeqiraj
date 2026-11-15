@@ -3,6 +3,8 @@ const API_ENDPOINT = new URL(
     window.location.origin,
 );
 
+let csrfToken = '';
+
 export class ApiError extends Error {
     constructor(message, status = 0, data = {}) {
         super(message);
@@ -26,12 +28,14 @@ function requestUrl(resource, params = {}) {
 }
 
 export function apiRequest(resource, options = {}) {
+    const method = options.method || 'GET';
     return fetch(requestUrl(resource, options.params), {
-        method: options.method || 'GET',
+        method,
         body: options.body,
         credentials: 'include',
         headers: {
             Accept: 'application/json',
+            ...(method !== 'GET' && method !== 'HEAD' && csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
             ...(options.headers || {}),
         },
     })
@@ -41,6 +45,10 @@ export function apiRequest(resource, options = {}) {
                 data = text ? JSON.parse(text) : {};
             } catch {
                 throw new ApiError('The server returned an invalid response.', response.status);
+            }
+
+            if (data.data?.csrfToken) {
+                csrfToken = data.data.csrfToken;
             }
 
             if (!response.ok || data.status !== 'success') {
